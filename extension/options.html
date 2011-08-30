@@ -45,14 +45,14 @@
 
      function saveOptions() {
        for (var index in OPTIONS) {
-         var name = OPTIONS[index];
+         var name = OPTIONS[index].name;
          var input = document.getElementById(name);
          localStorage[name] = input.value;
        }
 
        var message = document.getElementById("message");
        message.innerHTML = "Saved.";
-     setTimeout(function() {message.innerHTML = "";}, 750);
+       setTimeout(function() {message.innerHTML = "";}, 750);
      }
 
      $.ajax({url: "/manifest.json", 
