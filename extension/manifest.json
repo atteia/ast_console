@@ -1,0 +1,19 @@
+{
+  "name": "Asterisk",
+  "version": "0.1",
+  "description":"",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "Asterisk",
+    "default_popup": "popup.html"
+  },
+
+  "background_page": "background.html",
+  "options_page" : "options.html",
+
+  "permissions": [
+    "http://*/*",
+    "notifications"
+  ]
+}

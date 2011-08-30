@@ -1,0 +1,96 @@
+<html>
+   <style>
+     body {
+       font-size: 120%
+     }
+     .option {
+       padding: 3px;
+       margin: 3px;
+       border-top: 1px solid #ddd;
+     }
+     input[type=text] {
+        border: 1px solid black;
+        padding: 3px;
+        background-color: ivory;
+     }
+     .optionName {
+       font-weight: bold;
+       width: 170px;
+       display: inline-block;
+     }
+     .optionDescr {
+       display: block;
+       padding: 10px;
+       font-style: italic;
+     }
+   </style>
+   <script src="jquery-1.4.2.min.js"></script>
+  <body onload="restoreOptions()">
+   <script>
+     var OPTIONS = [{name: "mboxName",     default: "1@default"},
+                    {name: "serviceHost",  default: "localhost:8088"},
+                    {name: "dbHost",       default: "localhost:9000"},
+                    {name: "vmHost",       default: "localhost:8383"},
+                    {name: "revLookupUrl", default: "http://www.canada411.ca/search/?stype=si&what=$CALLERID$&where=&x=0&y=0"}];
+
+     function restoreOptions() {
+       for (var index in OPTIONS) {
+         var name = OPTIONS[index].name;
+         var value = localStorage[name];
+         if (!value) value = OPTIONS[index].default;
+         var input = document.getElementById(name);
+         input.value = value;
+       }
+     }
+
+     function saveOptions() {
+       for (var index in OPTIONS) {
+         var name = OPTIONS[index];
+         var input = document.getElementById(name);
+         localStorage[name] = input.value;
+       }
+
+       var message = document.getElementById("message");
+       message.innerHTML = "Saved.";
+     setTimeout(function() {message.innerHTML = "";}, 750);
+     }
+
+     $.ajax({url: "/manifest.json", 
+             dataType: "json",
+             success: function(metadata) {
+                $("#extensionName").html(metadata.name);
+                $("#versionNumber").html(metadata.version);
+             }
+             });
+   </script>
+
+   <h2><span id='extensionName'></span> extension configuration</h2>
+   <em>Version <span id='versionNumber'></span></em> <br/><br/>
+   <div>
+     <div class='option'>
+       <span class='optionName'>Mailbox name:</span> <input id="mboxName" type="text" value="">
+       <span class='optionDescr'>This is the name of the mailbox as supplied by your Asterisk administrator.</span>
+     </div>
+     <div class='option'>
+       <span class='optionName'>Service host:</span> <code>http://</code><input id="serviceHost" type="text" value=""><code>/mbox</code>
+       <span class='optionDescr'>This is the hostname:port the extension will fetch to retrieve the number of voicemails in your mailbox.</span>
+     </div>
+     <div class='option'>
+       <span class='optionName'>Call DB host:</span> <code>http://</code><input id="dbHost" type="text" value=""><code>/calls</code>
+       <span class='optionDescr'>This is the hostname:port of the CouchDB instance holding the calls database.</span>
+     </div>
+     <div class='option'>
+       <span class='optionName'>Voicemail host:</span> <code>http://</code><input id="vmHost" type="text" value=""><code>/cgi.bin/vmail.cgi</code>
+       <span class='optionDescr'>This is the hostname:port of the Comedian Mail server.</span>
+     </div>
+     <div class='option'>
+       <span class='optionName'>Reverse lookup URL:</span> <input id="revLookupUrl" type="text" value="" style="width:400px">
+       <span class='optionDescr'>This is the URL of the reverse lookup service. The URL can contain the variable <code>$CALLERID$</code>, which will get
+         replaced by the actual caller id.</span>
+     </div>
+     <button onclick="saveOptions()">Save</button>
+   </div>
+   <div id="message">
+   </div>
+  </body>
+</html>

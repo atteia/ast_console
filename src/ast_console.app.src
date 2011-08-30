@@ -1,0 +1,12 @@
+{application, ast_console,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { ast_console_app, []}},
+  {env, []}
+ ]}.

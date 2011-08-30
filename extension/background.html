@@ -1,0 +1,101 @@
+<html>
+  <head>
+   <script src="jquery-1.4.2.min.js"></script>
+  </head>
+
+  <body>
+   <script>
+     var CHECK_INTERVAL = 1000 * 60;
+
+     function getMboxName() {
+       var name = localStorage.mboxName;
+       return name == undefined ? "1@default" : name;
+     }
+     
+     function getMboxServiceUrl() {
+        var host = localStorage.serviceHost;
+       return host == undefined ? "http://localhost:8088/mbox" 
+                                : "http://" + host + "/mbox";
+     }
+
+     function notify(count) {
+       var notification = webkitNotifications.createNotification("icon.png","Asterisk", "You have " + count + " voicemail(s).");
+
+       notification.ondisplay = function() {setTimeout(function() {notification.cancel()}, 4000);}
+       notification.show();
+     }
+
+     function init() {
+       chrome.browserAction.setBadgeBackgroundColor({"color": [192,192,192,255]});
+       chrome.browserAction.setBadgeText({"text": "?"});
+     }
+
+     var waitingMessages = 0;
+
+     function onError(event) {
+       chrome.browserAction.setBadgeBackgroundColor({"color": [192,0,0,255]});
+       chrome.browserAction.setBadgeText({"text": "!"});
+     }
+
+     function onSuccess(count) {
+       if (count > 0) {
+         chrome.browserAction.setBadgeBackgroundColor({"color": [0,0,192,255]});
+         chrome.browserAction.setBadgeText({"text": "" + count});
+         if (waitingMessages == 0) {
+           notify(count);
+         }
+       }
+       else {
+         chrome.browserAction.setBadgeText({"text": ""});
+       }
+       waitingMessages = count;
+     }
+
+     var requestTimeout;
+
+     function scheduleRequest(interval) {
+       if (interval == undefined) {
+         interval = CHECK_INTERVAL;
+       }
+       if (requestTimeout) {
+         window.clearTimeout(requestTimeout);
+         requestTimeout = null;
+       }
+       requestTimeout = window.setTimeout(checkVoicemailCount, interval);
+     }
+
+     function checkVoicemailCount() {
+       $.ajax( {
+        url:  getMboxServiceUrl() + "?mbox=" + getMboxName(),
+        timeout: 1000,
+        dataType: "json",
+        success: function(data) {
+          if (data) {
+            onSuccess(data.count);
+          }
+          else {
+           onError('no data');
+          }
+        },
+        error: function(jqXHR, status, errorThrown) {
+          onError(status);
+        }
+       });
+
+       scheduleRequest();
+     }
+
+     chrome.extension.onRequest.addListener(
+        function(request, sender, sendResponse) {
+          if (request.refresh) {
+            checkVoicemailCount();
+            sendResponse({status: "done"});
+          }
+        });
+
+     init();
+     scheduleRequest(5000);
+     
+   </script>
+  </body>
+</html>
