@@ -32,8 +32,12 @@ terminate(_Reason, _Conf) ->
     error_logger:info_msg("Terminating channel_events~n", []),
     ok.
 
-handle_event({'Newstate', #ast_state{caller_id = CallerId, 
-                                     state_desc = 'Up',
+%% Handling of events.
+%%
+%% A new call is saved to the database when the state of the channel
+%% switches to 'Up'. At this point, the caller id/name should be known.
+handle_event({'Newstate', #ast_state{state_desc = 'Up',
+                                     caller_id = CallerId, 
                                      caller_id_name = CallerName,
                                      unique_id = Id}}, 
 	     Conf) ->
@@ -48,6 +52,8 @@ handle_event(_Event,Conf) ->
     {ok,Conf}.
 
 
+%% We save the call to the database only if the caller ID is not
+%% in the ignore list.
 save_call(#conf{couchdb = {CouchHost, CouchPort}, ignore_list = IgnoreList}, 
           Id, CallerId, CallerName, TimeStamp) ->
     case lists:member(CallerId, IgnoreList) of
