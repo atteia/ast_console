@@ -37,9 +37,9 @@ handle_event({'Newstate', #ast_state{caller_id = CallerId,
                                      unique_id = Id}}, 
 	     Conf) ->
     save_call(Conf,
-              list_to_binary(Id),
-	      list_to_binary(CallerId),
-	      list_to_binary(CallerName),
+              info(Id),
+	      info(CallerId),
+	      info(CallerName),
 	      tuple_to_list(date()) ++ tuple_to_list(time())),
     {ok, Conf};
 
@@ -62,4 +62,8 @@ save_call(#conf{couchdb = {CouchHost, CouchPort}, ignore_list = IgnoreList},
 	    ok
     end.
     
-
+info(undefined) ->
+    <<"">>;
+info(L)
+  when is_list(L) ->
+    list_to_binary(L).
