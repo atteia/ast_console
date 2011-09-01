@@ -33,6 +33,7 @@ terminate(_Reason, _Conf) ->
     ok.
 
 handle_event({'Newstate', #ast_state{caller_id = CallerId, 
+                                     state_desc = 'Up',
                                      caller_id_name = CallerName,
                                      unique_id = Id}}, 
 	     Conf) ->
