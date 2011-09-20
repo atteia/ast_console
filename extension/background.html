@@ -41,7 +41,7 @@
        if (count > 0) {
          chrome.browserAction.setBadgeBackgroundColor({"color": [0,0,192,255]});
          chrome.browserAction.setBadgeText({"text": "" + count});
-         if (waitingMessages == 0) {
+         if (waitingMessages != count) {
            notify(count);
          }
        }
