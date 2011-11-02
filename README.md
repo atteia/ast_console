@@ -29,7 +29,8 @@ the following command:
 
 
 In Google Chrome, install the extension from the `extension`
-directory, then right-click on the extension's icon and select
+directory (you have to open the chrome://extensions/ web page and select
+"Load unpacked extension"), then right-click on the extension's icon and select
 "Options". Complete the information on the configuration page and
 click "Save".
 
