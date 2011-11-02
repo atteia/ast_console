@@ -6,17 +6,23 @@
     .name { font-weight: bold; font-size: 9pt; color: #00d; }
     .number { text-align: right; }
     .timestamp { font-size: 80%;}
+
     #calls { 
       margin: 0px;
       padding: 0px;
     }
     .call {
+      padding-bottom: 5px;
     }
    </style>
    <script src="jquery-1.4.2.min.js"></script>
+   <script src="mustache.js"></script>
   </head>
   <body>
     <script>
+      var callTmpl = "";
+      $.get("call.tmpl", {}, function(txt) { callTmpl = txt; }, "text");
+
       function refresh() {
          chrome.extension.sendRequest({refresh: true}, function (response) {console.log(response);});
          getLastCalls();
@@ -81,10 +87,10 @@
         $(".call").remove();
         for(var index in calls) {
           var call = calls[index].value;
-          var timestampText = "<div class='timestamp'>" + formatDate(call.timestamp[0], call.timestamp[1], call.timestamp[2]) 
-                               + " " + formatTime(call.timestamp[3], call.timestamp[4], call.timestamp[5]) + "</div>"
-          var callHtml = $("<div class='call'><div class='name'><a href='' onclick='showLookup(\"" + call.callerid + "\")'>" + call.callerid + "<a/></div>" + timestampText + "<div class='number'>" + call.callernum + "</div></div>");
-          $("div.name", callHtml).append();
+          var dateStr = formatDate(call.timestamp[0], call.timestamp[1], call.timestamp[2]);
+          var timeStr = formatTime(call.timestamp[3], call.timestamp[4], call.timestamp[5]);
+          var callHtml = Mustache.to_html(callTmpl, { date: dateStr, time: timeStr, callerid: call.callerid, callernum: call.callernum});
+          console.log(callHtml);
           $("#calls").append(callHtml);
         }
       }
